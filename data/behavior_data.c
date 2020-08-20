@@ -3518,6 +3518,19 @@ const BehaviorScript bhvMario[] = {
     END_LOOP(),
 };
 
+const BehaviorScript bhvLuigi[] = {
+    BEGIN(OBJ_LIST_PLAYER),
+    SET_INT(oIntangibleTimer, 0),
+    OR_INT(oFlags, OBJ_FLAG_0100),
+    OR_INT(oUnk94, 0x0001),
+    SET_HITBOX(/*Radius*/ 37, /*Height*/ 160),
+    BEGIN_LOOP(),
+        CALL_NATIVE(try_print_debug_mario_level_info),
+        CALL_NATIVE(bhv_luigi_update),
+        CALL_NATIVE(try_do_mario_debug_object_spawn),
+    END_LOOP(),
+};
+
 const BehaviorScript bhvToadMessage[] = {
     BEGIN(OBJ_LIST_GENACTOR),
     OR_INT(oFlags, (OBJ_FLAG_PERSISTENT_RESPAWN | OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),

@@ -458,7 +458,8 @@ void read_controller_inputs(void) {
     // controller information.
     if (gControllerBits) {
         osRecvMesg(&gSIEventMesgQueue, &D_80339BEC, OS_MESG_BLOCK);
-        osContGetReadData(&gControllerPads[0]);
+        osContGetReadData(gControllers[0].controllerData, 2);
+        osContGetReadData(gControllers[1].controllerData, 1);
     }
     run_demo_inputs();
 

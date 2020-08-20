@@ -1666,7 +1666,7 @@ void mario_update_hitbox_and_cap_model(struct MarioState *m) {
         //  this can be paused through to give continual invisibility. This leads to
         //  no interaction with objects.
         if (gGlobalTimer & 1) {
-            gMarioState->marioObj->header.gfx.node.flags |= GRAPH_RENDER_INVISIBLE;
+            m->marioObj->header.gfx.node.flags |= GRAPH_RENDER_INVISIBLE;
         }
     }
 
@@ -1735,7 +1735,7 @@ void func_sh_8025574C(void) {
 /**
  * Main function for executing Mario's behavior.
  */
-s32 execute_mario_action(UNUSED struct Object *o) {
+s32 execute_mario_action(UNUSED struct Object *o, struct MarioState *state) {
     s32 inLoop = TRUE;
     /**
     * Cheat stuff
@@ -1744,26 +1744,26 @@ s32 execute_mario_action(UNUSED struct Object *o) {
     if (Cheats.EnableCheats)
     {
         if (Cheats.GodMode)
-            gMarioState->health = 0x880;
+            state->health = 0x880;
 
-        if (Cheats.InfiniteLives && gMarioState->numLives < 99)
-            gMarioState->numLives += 1;
+        if (Cheats.InfiniteLives && state->numLives < 99)
+            state->numLives += 1;
 
-        if (Cheats.SuperSpeed && gMarioState->forwardVel > 0)
-            gMarioState->forwardVel += 100;
+        if (Cheats.SuperSpeed && state->forwardVel > 0)
+            state->forwardVel += 100;
     }
     /**
     * End of cheat stuff
     */
-    if (gMarioState->action) {
-        gMarioState->marioObj->header.gfx.node.flags &= ~GRAPH_RENDER_INVISIBLE;
-        mario_reset_bodystate(gMarioState);
-        update_mario_inputs(gMarioState);
-        mario_handle_special_floors(gMarioState);
-        mario_process_interactions(gMarioState);
+    if (state->action) {
+        state->marioObj->header.gfx.node.flags &= ~GRAPH_RENDER_INVISIBLE;
+        mario_reset_bodystate(state);
+        update_mario_inputs(state);
+        mario_handle_special_floors(state);
+        mario_process_interactions(state);
 
         // If Mario is OOB, stop executing actions.
-        if (gMarioState->floor == NULL) {
+        if (state->floor == NULL) {
             return 0;
         }
 
@@ -1771,65 +1771,65 @@ s32 execute_mario_action(UNUSED struct Object *o) {
         // which can lead to unexpected sub-frame behavior. Could potentially hang
         // if a loop of actions were found, but there has not been a situation found.
         while (inLoop) {
-            switch (gMarioState->action & ACT_GROUP_MASK) {
+            switch (state->action & ACT_GROUP_MASK) {
                 case ACT_GROUP_STATIONARY:
-                    inLoop = mario_execute_stationary_action(gMarioState);
+                    inLoop = mario_execute_stationary_action(state);
                     break;
 
                 case ACT_GROUP_MOVING:
-                    inLoop = mario_execute_moving_action(gMarioState);
+                    inLoop = mario_execute_moving_action(state);
                     break;
 
                 case ACT_GROUP_AIRBORNE:
-                    inLoop = mario_execute_airborne_action(gMarioState);
+                    inLoop = mario_execute_airborne_action(state);
                     break;
 
                 case ACT_GROUP_SUBMERGED:
-                    inLoop = mario_execute_submerged_action(gMarioState);
+                    inLoop = mario_execute_submerged_action(state);
                     break;
 
                 case ACT_GROUP_CUTSCENE:
-                    inLoop = mario_execute_cutscene_action(gMarioState);
+                    inLoop = mario_execute_cutscene_action(state);
                     break;
 
                 case ACT_GROUP_AUTOMATIC:
-                    inLoop = mario_execute_automatic_action(gMarioState);
+                    inLoop = mario_execute_automatic_action(state);
                     break;
 
                 case ACT_GROUP_OBJECT:
-                    inLoop = mario_execute_object_action(gMarioState);
+                    inLoop = mario_execute_object_action(state);
                     break;
             }
         }
 
-        sink_mario_in_quicksand(gMarioState);
-        squish_mario_model(gMarioState);
-        set_submerged_cam_preset_and_spawn_bubbles(gMarioState);
-        update_mario_health(gMarioState);
-        update_mario_info_for_cam(gMarioState);
-        mario_update_hitbox_and_cap_model(gMarioState);
+        sink_mario_in_quicksand(state);
+        squish_mario_model(state);
+        set_submerged_cam_preset_and_spawn_bubbles(state);
+        update_mario_health(state);
+        update_mario_info_for_cam(state);
+        mario_update_hitbox_and_cap_model(state);
 
         // Both of the wind handling portions play wind audio only in
         // non-Japanese releases.
-        if (gMarioState->floor->type == SURFACE_HORIZONTAL_WIND) {
-            spawn_wind_particles(0, (gMarioState->floor->force << 8));
+        if (state->floor->type == SURFACE_HORIZONTAL_WIND) {
+            spawn_wind_particles(0, (state->floor->force << 8));
 #ifndef VERSION_JP
-            play_sound(SOUND_ENV_WIND2, gMarioState->marioObj->header.gfx.cameraToObject);
+            play_sound(SOUND_ENV_WIND2, state->marioObj->header.gfx.cameraToObject);
 #endif
         }
 
-        if (gMarioState->floor->type == SURFACE_VERTICAL_WIND) {
+        if (state->floor->type == SURFACE_VERTICAL_WIND) {
             spawn_wind_particles(1, 0);
 #ifndef VERSION_JP
-            play_sound(SOUND_ENV_WIND2, gMarioState->marioObj->header.gfx.cameraToObject);
+            play_sound(SOUND_ENV_WIND2, state->marioObj->header.gfx.cameraToObject);
 #endif
         }
 
         play_infinite_stairs_music();
-        gMarioState->marioObj->oInteractStatus = 0;
+        state->marioObj->oInteractStatus = 0;
         func_sh_8025574C();
 
-        return gMarioState->particleFlags;
+        return state->particleFlags;
     }
 
     return 0;
@@ -1920,9 +1920,75 @@ void init_mario(void) {
 
         capObject->oMoveAngleYaw = 0;
     }
+
+    // GIVE LUIGI HIS OWN INIT FUNC, OR PARAMETERIZE, WHATEvER THIS IS JUST TEMP
+    gLuigiState->actionTimer = 0;
+    gLuigiState->framesSinceA = 0xFF;
+    gLuigiState->framesSinceB = 0xFF;
+
+    gLuigiState->invincTimer = 0;
+
+    if (save_file_get_flags()
+        & (SAVE_FLAG_CAP_ON_GROUND | SAVE_FLAG_CAP_ON_KLEPTO | SAVE_FLAG_CAP_ON_UKIKI
+           | SAVE_FLAG_CAP_ON_MR_BLIZZARD)) {
+        gLuigiState->flags = 0;
+    } else {
+        gLuigiState->flags = (MARIO_CAP_ON_HEAD | MARIO_NORMAL_CAP);
+    }
+
+    gLuigiState->forwardVel = 0.0f;
+    gLuigiState->squishTimer = 0;
+
+    gLuigiState->hurtCounter = 0;
+    gLuigiState->healCounter = 0;
+
+    gLuigiState->capTimer = 0;
+    gLuigiState->quicksandDepth = 0.0f;
+
+    gLuigiState->heldObj = NULL;
+    gLuigiState->riddenObj = NULL;
+    gLuigiState->usedObj = NULL;
+
+    gLuigiState->waterLevel =
+        find_water_level(gLuigiSpawnInfo->startPos[0], gLuigiSpawnInfo->startPos[2]);
+
+    gLuigiState->area = gCurrentArea;
+    gLuigiState->marioObj = gMarioObject;
+    gLuigiState->marioObj->header.gfx.unk38.animID = -1;
+    vec3s_copy(gLuigiState->faceAngle, gLuigiSpawnInfo->startAngle);
+    vec3s_set(gLuigiState->angleVel, 0, 0, 0);
+    vec3s_to_vec3f(gLuigiState->pos, gLuigiSpawnInfo->startPos);
+    vec3f_set(gLuigiState->vel, 0, 0, 0);
+    gLuigiState->floorHeight =
+        find_floor(gLuigiState->pos[0], gLuigiState->pos[1], gLuigiState->pos[2], &gLuigiState->floor);
+
+    if (gLuigiState->pos[1] < gLuigiState->floorHeight) {
+        gLuigiState->pos[1] = gLuigiState->floorHeight;
+    }
+
+    gLuigiState->marioObj->header.gfx.pos[1] = gLuigiState->pos[1];
+
+    gLuigiState->action =
+        (gLuigiState->pos[1] <= (gLuigiState->waterLevel - 100)) ? ACT_WATER_IDLE : ACT_IDLE;
+
+    mario_reset_bodystate(gLuigiState);
+    update_mario_info_for_cam(gLuigiState);
+    gLuigiState->marioBodyState->punchState = 0;
+
+    gLuigiState->marioObj->oPosX = gLuigiState->pos[0];
+    gLuigiState->marioObj->oPosY = gLuigiState->pos[1];
+    gLuigiState->marioObj->oPosZ = gLuigiState->pos[2];
+
+    gLuigiState->marioObj->oMoveAnglePitch = gLuigiState->faceAngle[0];
+    gLuigiState->marioObj->oMoveAngleYaw = gLuigiState->faceAngle[1];
+    gLuigiState->marioObj->oMoveAngleRoll = gLuigiState->faceAngle[2];
+
+    vec3f_copy(gLuigiState->marioObj->header.gfx.pos, gLuigiState->pos);
+    vec3s_set(gLuigiState->marioObj->header.gfx.angle, 0, gLuigiState->faceAngle[1], 0);
 }
 
 void init_mario_from_save_file(void) {
+    // SAME THING HERE ABOUT INITING LUIGI
     gMarioState->unk00 = 0;
     gMarioState->flags = 0;
     gMarioState->action = 0;
@@ -1945,4 +2011,25 @@ void init_mario_from_save_file(void) {
 
     gHudDisplay.coins = 0;
     gHudDisplay.wedges = 8;
+
+    // SAME THING HERE ABOUT INITING LUIGI
+    gLuigiState->unk00 = 0;
+    gLuigiState->flags = 0;
+    gLuigiState->action = 0;
+    gLuigiState->spawnInfo = &gPlayerSpawnInfos[1];
+    gLuigiState->statusForCamera = &gPlayerCameraState[0];
+    gLuigiState->marioBodyState = &gBodyStates[1];
+    gLuigiState->controller = &gControllers[1];
+    gLuigiState->animation = &D_80339D10;
+
+    gLuigiState->numCoins = 0;
+    gLuigiState->numStars =
+        save_file_get_total_star_count(gCurrSaveFileNum - 1, COURSE_MIN - 1, COURSE_MAX - 1);
+    gLuigiState->numKeys = 0;
+
+    gLuigiState->numLives = 4;
+    gLuigiState->health = 0x880;
+
+    gLuigiState->unkB8 = gLuigiState->numStars;
+    gLuigiState->unkB0 = 0xBD;
 }

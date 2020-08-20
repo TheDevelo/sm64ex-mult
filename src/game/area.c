@@ -23,7 +23,7 @@
 
 #include "gfx_dimensions.h"
 
-struct SpawnInfo gPlayerSpawnInfos[1];
+struct SpawnInfo gPlayerSpawnInfos[2];
 struct GraphNode *D_8033A160[0x100];
 struct Area gAreaData[8];
 
@@ -37,6 +37,7 @@ s16 gPauseScreenMode;
 s16 gSaveOptSelectIndex;
 
 struct SpawnInfo *gMarioSpawnInfo = &gPlayerSpawnInfos[0];
+struct SpawnInfo *gLuigiSpawnInfo = &gPlayerSpawnInfos[1];
 struct GraphNode **gLoadedGraphNodes = D_8033A160;
 struct Area *gAreas = gAreaData;
 struct Area *gCurrentArea = NULL;
@@ -265,6 +266,7 @@ void load_mario_area(void) {
     if (gCurrentArea->index == gMarioSpawnInfo->areaIndex) {
         gCurrentArea->flags |= 0x01;
         spawn_objects_from_info(0, gMarioSpawnInfo);
+        spawn_objects_from_info(0, gLuigiSpawnInfo);
     }
 }
 

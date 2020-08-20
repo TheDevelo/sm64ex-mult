@@ -798,6 +798,33 @@ static void level_cmd_cleardemoptr(void)
     sCurrentCmd = CMD_NEXT;
 }
 
+static void level_cmd_init_luigi(void) {
+    vec3s_set(gLuigiSpawnInfo->startPos, 0, 0, 0);
+    vec3s_set(gLuigiSpawnInfo->startAngle, 0, 0, 0);
+
+    gLuigiSpawnInfo->activeAreaIndex = -1;
+    gLuigiSpawnInfo->areaIndex = 0;
+    gLuigiSpawnInfo->behaviorArg = CMD_GET(u32, 4);
+    gLuigiSpawnInfo->behaviorScript = CMD_GET(void *, 8);
+    gLuigiSpawnInfo->unk18 = gLoadedGraphNodes[CMD_GET(u8, 3)];
+    gLuigiSpawnInfo->next = NULL;
+
+    sCurrentCmd = CMD_NEXT;
+}
+
+static void level_cmd_set_luigi_start_pos(void) {
+    gLuigiSpawnInfo->areaIndex = CMD_GET(u8, 2);
+
+#if IS_64_BIT
+    vec3s_set(gLuigiSpawnInfo->startPos, CMD_GET(s16, 6), CMD_GET(s16, 8), CMD_GET(s16, 10));
+#else
+    vec3s_copy(gLuigiSpawnInfo->startPos, CMD_GET(Vec3s, 6));
+#endif
+    vec3s_set(gLuigiSpawnInfo->startAngle, 0, CMD_GET(s16, 4) * 0x8000 / 180, 0);
+
+    sCurrentCmd = CMD_NEXT;
+}
+
 static void (*LevelScriptJumpTable[])(void) = {
     /*00*/ level_cmd_load_and_execute,
     /*01*/ level_cmd_exit_and_execute,
@@ -862,6 +889,8 @@ static void (*LevelScriptJumpTable[])(void) = {
     /*3C*/ level_cmd_get_or_set_var,
     /*3D*/ level_cmd_advdemo,
     /*3E*/ level_cmd_cleardemoptr,
+    /*3F*/ level_cmd_init_luigi,
+    /*40*/ level_cmd_set_luigi_start_pos,
 };
 
 struct LevelCommand *level_script_execute(struct LevelCommand *cmd) {

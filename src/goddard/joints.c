@@ -66,7 +66,7 @@ void Proc8018E520(struct ObjJoint *self) {
         self->unk1BC |= 0x2000;
         ; // necessary?
     } else {
-        if (gGdCtrl.trgR == FALSE) // R-trigger not held or released
+        if (gGdCtrl.trgR != FALSE) // R-trigger not held or released
         {
             self->unk78.x -= sp64.x * 0.5; //? 0.5f
             self->unk78.y -= sp64.y * 0.5; //? 0.5f

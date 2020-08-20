@@ -195,7 +195,7 @@ extern s32		osContStartReadData(OSMesgQueue *);
 extern s32		osContSetCh(u8);
 #endif
 extern void		osContGetQuery(OSContStatus *);
-extern void		osContGetReadData(OSContPad *);
+extern void		osContGetReadData(OSContPad *, int port);
 
 
 #endif  /* defined(_LANGUAGE_C) || defined(_LANGUAGE_C_PLUS_PLUS) */

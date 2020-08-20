@@ -221,13 +221,7 @@ struct ParticleProperties sParticleTypes[] = {
  * Copy position, velocity, and angle variables from MarioState to the mario
  * object.
  */
-void copy_mario_state_to_object(void) {
-    s32 i = 0;
-    // L is real
-    if (gCurrentObject != gMarioObject) {
-        i += 1;
-    }
-
+void copy_mario_state_to_object(s32 i) {
     gCurrentObject->oVelX = gMarioStates[i].vel[0];
     gCurrentObject->oVelY = gMarioStates[i].vel[1];
     gCurrentObject->oVelZ = gMarioStates[i].vel[2];
@@ -268,12 +262,34 @@ void bhv_mario_update(void) {
     u32 particleFlags = 0;
     s32 i;
 
-    particleFlags = execute_mario_action(gCurrentObject);
+    particleFlags = execute_mario_action(gCurrentObject, gMarioState);
     gCurrentObject->oMarioParticleFlags = particleFlags;
 
     // Mario code updates MarioState's versions of position etc, so we need
     // to sync it with the mario object
-    copy_mario_state_to_object();
+    copy_mario_state_to_object(0);
+
+    i = 0;
+    while (sParticleTypes[i].particleFlag != 0) {
+        if (particleFlags & sParticleTypes[i].particleFlag) {
+            spawn_particle(sParticleTypes[i].activeParticleFlag, sParticleTypes[i].model,
+                           sParticleTypes[i].behavior);
+        }
+
+        i++;
+    }
+}
+
+void bhv_luigi_update(void) {
+    u32 particleFlags = 0;
+    s32 i;
+
+    particleFlags = execute_mario_action(gCurrentObject, gLuigiState);
+    gCurrentObject->oMarioParticleFlags = particleFlags;
+
+    // Mario code updates MarioState's versions of position etc, so we need
+    // to sync it with the mario object
+    copy_mario_state_to_object(1);
 
     i = 0;
     while (sParticleTypes[i].particleFlag != 0) {
@@ -498,6 +514,10 @@ void spawn_objects_from_info(UNUSED s32 unused, struct SpawnInfo *spawnInfo) {
             if (spawnInfo->behaviorArg & 0x01) {
                 gMarioObject = object;
                 geo_make_first_child(&object->header.gfx.node);
+            }
+
+            if (spawnInfo->behaviorArg & 0x02) {
+                gLuigiObject = object;
             }
 
             geo_obj_init_spawninfo(&object->header.gfx, spawnInfo);
