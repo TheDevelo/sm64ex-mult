@@ -6,7 +6,7 @@ Run `./extract_assets.py --clean && make clean` or `make distclean` to remove RO
 
 ## How to use
 Player 1 is controlled by the keyboard, while Player 2 is controlled by a controller.  
-Many interactions, such as menus, opening doors, and entering paintings, can be only performed by Player 1 currently.
+Many interactions, such as menus and entering paintings, can be only performed by Player 1 currently.
 
 ## Building
 **DO NOT BUILD WITH BETTERCAMERA=1**. BETTERCAMERA works by hijacks Player 2's controller, so Player 2 will not work with it enabled.  

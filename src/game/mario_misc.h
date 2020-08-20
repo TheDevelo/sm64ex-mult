@@ -25,4 +25,19 @@ extern Gfx *geo_switch_mario_hand_grab_pos(s32 callContext, struct GraphNode *b,
 extern Gfx *geo_render_mirror_mario(s32 a, struct GraphNode *b, UNUSED Mat4 *c);
 extern Gfx *geo_mirror_mario_backface_culling(s32 a, struct GraphNode *b, UNUSED Mat4 *c);
 
+extern Gfx *geo_mirror_luigi_set_alpha(s32 a, struct GraphNode *b, UNUSED Mat4 *c);
+extern Gfx *geo_switch_luigi_stand_run(s32 run, struct GraphNode *node, UNUSED Mat4 *c);
+extern Gfx *geo_switch_luigi_eyes(s32 run, struct GraphNode *node, UNUSED Mat4 *c);
+extern Gfx *geo_luigi_tilt_torso(s32 a, struct GraphNode *b, UNUSED Mat4 *c);
+extern Gfx *geo_luigi_head_rotation(s32 a, struct GraphNode *b, UNUSED Mat4 *c);
+extern Gfx *geo_switch_luigi_hand(s32 run, struct GraphNode *node, UNUSED Mat4 *c);
+extern Gfx *geo_luigi_hand_foot_scaler(s32 a, struct GraphNode *b, UNUSED Mat4 *c);
+extern Gfx *geo_switch_luigi_cap_effect(s32 run, struct GraphNode *node, UNUSED Mat4 *c);
+extern Gfx *geo_switch_luigi_cap_on_off(s32 run, struct GraphNode *node, UNUSED Mat4 *c);
+extern Gfx *geo_luigi_rotate_wing_cap_wings(s32 a, struct GraphNode *b, UNUSED Mat4 *c);
+extern Gfx *geo_switch_luigi_hand_grab_pos(s32 callContext, struct GraphNode *b, Mat4 *c);
+extern Gfx *geo_render_mirror_luigi(s32 a, struct GraphNode *b, UNUSED Mat4 *c);
+extern Gfx *geo_mirror_luigi_backface_culling(s32 a, struct GraphNode *b, UNUSED Mat4 *c);
+
+
 #endif /* _MARIO_MISC_H */

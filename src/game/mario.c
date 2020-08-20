@@ -1953,7 +1953,7 @@ void init_mario(void) {
         find_water_level(gLuigiSpawnInfo->startPos[0], gLuigiSpawnInfo->startPos[2]);
 
     gLuigiState->area = gCurrentArea;
-    gLuigiState->marioObj = gMarioObject;
+    gLuigiState->marioObj = gLuigiObject;
     gLuigiState->marioObj->header.gfx.unk38.animID = -1;
     vec3s_copy(gLuigiState->faceAngle, gLuigiSpawnInfo->startAngle);
     vec3s_set(gLuigiState->angleVel, 0, 0, 0);
@@ -1996,7 +1996,7 @@ void init_mario_from_save_file(void) {
     gMarioState->statusForCamera = &gPlayerCameraState[0];
     gMarioState->marioBodyState = &gBodyStates[0];
     gMarioState->controller = &gControllers[0];
-    gMarioState->animation = &D_80339D10;
+    gMarioState->animation = &D_80339D10[0];
 
     gMarioState->numCoins = 0;
     gMarioState->numStars =
@@ -2017,10 +2017,10 @@ void init_mario_from_save_file(void) {
     gLuigiState->flags = 0;
     gLuigiState->action = 0;
     gLuigiState->spawnInfo = &gPlayerSpawnInfos[1];
-    gLuigiState->statusForCamera = &gPlayerCameraState[0];
+    gLuigiState->statusForCamera = &gPlayerCameraState[1];
     gLuigiState->marioBodyState = &gBodyStates[1];
     gLuigiState->controller = &gControllers[1];
-    gLuigiState->animation = &D_80339D10;
+    gLuigiState->animation = &D_80339D10[1];
 
     gLuigiState->numCoins = 0;
     gLuigiState->numStars =

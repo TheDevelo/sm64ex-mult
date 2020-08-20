@@ -550,6 +550,7 @@ void bhv_yoshi_loop(void);
 void bhv_volcano_trap_loop(void);
 
 extern Gfx *geo_move_mario_part_from_parent(s32 run, UNUSED struct GraphNode *node, Mat4 mtx);
+extern Gfx *geo_move_luigi_part_from_parent(s32 run, UNUSED struct GraphNode *node, Mat4 mtx);
 
 // Bowser
 extern Gfx *geo_bits_bowser_coloring(s32 a0, struct GraphNode *node, UNUSED s32 a2);
