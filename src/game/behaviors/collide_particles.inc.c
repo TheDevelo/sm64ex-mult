@@ -8,10 +8,18 @@ s16 D_8032F2E4[] = { 0xE000, 0,      0,      0,      0x2000, 0,      0xE99A,
 
 void bhv_punch_tiny_triangle_loop(void) {
     s16 sp1E;
+    struct Object* player;
+    if (o->oBehParams == 0) {
+        player = gMarioObject;
+    }
+    else {
+        player = gLuigiObject;
+    }
+
     if (o->oTimer == 0) {
         sp1E = o->oMoveAngleYaw;
         o->oCollisionParticleUnkF4 = 1.28f;
-        cur_obj_set_pos_relative(gMarioObject, 0.0f, 60.0f, 100.0f);
+        cur_obj_set_pos_relative(player, 0.0f, 60.0f, 100.0f);
         o->oMoveAngleYaw = sp1E;
     }
     cur_obj_move_using_fvel_and_gravity();
@@ -26,20 +34,37 @@ void bhv_punch_tiny_triangle_init(void) {
     s32 i;
     UNUSED s32 unused;
     struct Object *triangle;
+    struct Object* player;
+    if (o->oBehParams == 0) {
+        player = gMarioObject;
+    }
+    else {
+        player = gLuigiObject;
+    }
+
     for (i = 0; i < 6; i++) {
         triangle = spawn_object(o, MODEL_DIRT_ANIMATION, bhvPunchTinyTriangle);
-        triangle->oMoveAngleYaw = gMarioObject->oMoveAngleYaw + D_8032F2CC[2 * i] + 0x8000;
+        triangle->oMoveAngleYaw = player->oMoveAngleYaw + D_8032F2CC[2 * i] + 0x8000;
         triangle->oVelY = sins(D_8032F2CC[2 * i + 1]) * 25.0f;
         triangle->oForwardVel = coss(D_8032F2CC[2 * i + 1]) * 25.0f;
+        triangle->oBehParams = o->oBehParams; // Pass along params for the loop func
     }
 }
 
 void bhv_wall_tiny_star_particle_loop(void) {
     s16 sp1E;
+    struct Object* player;
+    if (o->oBehParams == 0) {
+        player = gMarioObject;
+    }
+    else {
+        player = gLuigiObject;
+    }
+
     if (o->oTimer == 0) {
         sp1E = o->oMoveAngleYaw;
         o->oCollisionParticleUnkF4 = 0.28f;
-        cur_obj_set_pos_relative(gMarioObject, 0.0f, 30.0f, 110.0f);
+        cur_obj_set_pos_relative(player, 0.0f, 30.0f, 110.0f);
         o->oMoveAngleYaw = sp1E;
     }
     cur_obj_move_using_fvel_and_gravity();
@@ -52,11 +77,20 @@ void bhv_tiny_star_particles_init(void) {
     s32 i;
     UNUSED s32 unused;
     struct Object *particle;
+    struct Object* player;
+    if (o->oBehParams == 0) {
+        player = gMarioObject;
+    }
+    else {
+        player = gLuigiObject;
+    }
+
     for (i = 0; i < 7; i++) {
         particle = spawn_object(o, MODEL_CARTOON_STAR, bhvWallTinyStarParticle);
-        particle->oMoveAngleYaw = gMarioObject->oMoveAngleYaw + D_8032F2E4[2 * i] + 0x8000;
+        particle->oMoveAngleYaw = player->oMoveAngleYaw + D_8032F2E4[2 * i] + 0x8000;
         particle->oVelY = sins(D_8032F2E4[2 * i + 1]) * 25.0f;
         particle->oForwardVel = coss(D_8032F2E4[2 * i + 1]) * 25.0f;
+        particle->oBehParams = o->oBehParams; // Pass along params for the loop func
     }
 }
 

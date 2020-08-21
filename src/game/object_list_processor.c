@@ -250,7 +250,12 @@ void spawn_particle(u32 activeParticleFlag, s16 model, const BehaviorScript *beh
     if (!(gCurrentObject->oActiveParticleFlags & activeParticleFlag)) {
         struct Object *particle;
         gCurrentObject->oActiveParticleFlags |= activeParticleFlag;
-        particle = spawn_object_at_origin(gCurrentObject, 0, model, behavior);
+        s32 playerIdx = 0;
+        // Don't know any better way to switch player index
+        if (gCurrentObject == gLuigiObject) {
+            playerIdx = 1;
+        }
+        particle = spawn_object_at_origin(gCurrentObject, playerIdx, model, behavior);
         obj_copy_pos_and_angle(particle, gCurrentObject);
     }
 }

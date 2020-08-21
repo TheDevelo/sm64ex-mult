@@ -530,7 +530,7 @@ struct Object *spawn_water_droplet(struct Object *parent, struct WaterDropletPar
     return newObj;
 }
 
-struct Object *spawn_object_at_origin(struct Object *parent, UNUSED s32 unusedArg, u32 model,
+struct Object *spawn_object_at_origin(struct Object *parent, s32 behParams, u32 model,
                                       const BehaviorScript *behavior) {
     struct Object *obj;
     const BehaviorScript *behaviorAddr;
@@ -541,6 +541,9 @@ struct Object *spawn_object_at_origin(struct Object *parent, UNUSED s32 unusedAr
     obj->parentObj = parent;
     obj->header.gfx.unk18 = parent->header.gfx.unk18;
     obj->header.gfx.unk19 = parent->header.gfx.unk18;
+    // These two are only used to differentiate player for particles such as wall bonks
+    obj->oBehParams = behParams;
+    obj->oBehParams2ndByte = (behParams >> 16) & 0xFF;
 
     geo_obj_init((struct GraphNodeObject *) &obj->header.gfx, gLoadedGraphNodes[model], gVec3fZero,
                  gVec3sZero);
