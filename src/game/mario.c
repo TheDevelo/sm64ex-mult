@@ -1931,7 +1931,7 @@ void init_mario(int player) {
 
 void init_mario_from_save_file(int player) {
     // SAME THING HERE ABOUT INITING LUIGI
-    gMarioStates[player].unk00 = 0;
+    gMarioStates[player].unk00 = player;
     gMarioStates[player].flags = 0;
     gMarioStates[player].action = 0;
     gMarioStates[player].spawnInfo = &gPlayerSpawnInfos[player];
