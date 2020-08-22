@@ -50,7 +50,7 @@ extern s32 check_common_hold_action_exits(struct MarioState *m);
 extern s32 transition_submerged_to_walking(struct MarioState *m);
 extern s32 set_water_plunge_action(struct MarioState *m);
 extern s32 execute_mario_action(struct Object *o, struct MarioState *state);
-extern void init_mario(void);
-extern void init_mario_from_save_file(void);
+extern void init_mario(int player);
+extern void init_mario_from_save_file(int player);
 
 #endif /* _MARIO_H */

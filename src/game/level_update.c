@@ -375,29 +375,39 @@ void init_mario_after_warp(void) {
     struct ObjectWarpNode *spawnNode = area_get_warp_node(sWarpDest.nodeId);
     u32 marioSpawnType = get_mario_spawn_type(spawnNode->object);
 
-    if (gMarioState->action != ACT_UNINITIALIZED) {
-        gPlayerSpawnInfos[0].startPos[0] = (s16) spawnNode->object->oPosX;
-        gPlayerSpawnInfos[0].startPos[1] = (s16) spawnNode->object->oPosY;
-        gPlayerSpawnInfos[0].startPos[2] = (s16) spawnNode->object->oPosZ;
+    bool load_area = false;
+    // Have to split into 3 chunks so we load_mario_area() only once
+    for (int i = 0; i <= 1; i++) {
+        if (gMarioStates[i].action != ACT_UNINITIALIZED) {
+            gPlayerSpawnInfos[i].startPos[0] = (s16) spawnNode->object->oPosX;
+            gPlayerSpawnInfos[i].startPos[1] = (s16) spawnNode->object->oPosY;
+            gPlayerSpawnInfos[i].startPos[2] = (s16) spawnNode->object->oPosZ;
 
-        gPlayerSpawnInfos[0].startAngle[0] = 0;
-        gPlayerSpawnInfos[0].startAngle[1] = spawnNode->object->oMoveAngleYaw;
-        gPlayerSpawnInfos[0].startAngle[2] = 0;
+            gPlayerSpawnInfos[i].startAngle[0] = 0;
+            gPlayerSpawnInfos[i].startAngle[1] = spawnNode->object->oMoveAngleYaw;
+            gPlayerSpawnInfos[i].startAngle[2] = 0;
 
-        if (marioSpawnType == MARIO_SPAWN_UNKNOWN_01) {
-            init_door_warp(&gPlayerSpawnInfos[0], sWarpDest.arg);
+            if (marioSpawnType == MARIO_SPAWN_UNKNOWN_01) {
+                init_door_warp(&gPlayerSpawnInfos[i], sWarpDest.arg);
+            }
+
+            if (sWarpDest.type == WARP_TYPE_CHANGE_LEVEL || sWarpDest.type == WARP_TYPE_CHANGE_AREA) {
+                gPlayerSpawnInfos[i].areaIndex = sWarpDest.areaIdx;
+                load_area = true;
+            }
         }
+    }
+    if (load_area) {
+        load_mario_area();
+    }
+    for (int i = 0; i <= 1; i++) {
+        if (gMarioStates[i].action != ACT_UNINITIALIZED) {
+            init_mario(i);
+            set_mario_initial_action(&gMarioStates[i], marioSpawnType, sWarpDest.arg);
 
-        if (sWarpDest.type == WARP_TYPE_CHANGE_LEVEL || sWarpDest.type == WARP_TYPE_CHANGE_AREA) {
-            gPlayerSpawnInfos[0].areaIndex = sWarpDest.areaIdx;
-            load_mario_area();
+            gMarioStates[i].interactObj = spawnNode->object;
+            gMarioStates[i].usedObj = spawnNode->object;
         }
-
-        init_mario();
-        set_mario_initial_action(gMarioState, marioSpawnType, sWarpDest.arg);
-
-        gMarioState->interactObj = spawnNode->object;
-        gMarioState->usedObj = spawnNode->object;
     }
 
     reset_camera(gCurrentArea->camera);
@@ -517,7 +527,8 @@ void warp_credits(void) {
     gPlayerSpawnInfos[0].areaIndex = sWarpDest.areaIdx;
 
     load_mario_area();
-    init_mario();
+    init_mario(0);
+    init_mario(1);
 
     set_mario_action(gMarioState, marioAction, 0);
 
@@ -1192,7 +1203,8 @@ s32 init_level(void) {
     } else {
         if (gPlayerSpawnInfos[0].areaIndex >= 0) {
             load_mario_area();
-            init_mario();
+            init_mario(0);
+            init_mario(1);
         }
 
         if (gCurrentArea != NULL) {
@@ -1281,7 +1293,8 @@ s32 lvl_init_from_save_file(UNUSED s16 arg0, s32 levelNum) {
     gCurrCreditsEntry = NULL;
     gSpecialTripleJump = 0;
 
-    init_mario_from_save_file();
+    init_mario_from_save_file(0);
+    init_mario_from_save_file(1);
     disable_warp_checkpoint();
     save_file_move_cap_to_default_location();
     select_mario_cam_mode();
