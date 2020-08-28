@@ -71,6 +71,9 @@ int detect_object_hurtbox_overlap(struct Object *a, struct Object *b) {
     if (a == gMarioObject) {
         b->oInteractionSubtype |= INT_SUBTYPE_DELAY_INVINCIBILITY;
     }
+    if (a == gLuigiObject) {
+        b->oInteractionSubtype |= INT_SUBTYPE_DELAY_INVINCIBILITY_LUIGI;
+    }
 
     if (sp28 > sp24) {
         f32 sp20 = a->hitboxHeight + sp3C;
@@ -84,6 +87,11 @@ int detect_object_hurtbox_overlap(struct Object *a, struct Object *b) {
         }
         if (a == gMarioObject) {
             b->oInteractionSubtype &= ~INT_SUBTYPE_DELAY_INVINCIBILITY;
+        }
+        if (a == gLuigiObject) {
+            // TODO: At least for goombas, this never gets set for luigi despite collision conditions
+            // Maybe the math is wrong, maybe he pushed the goomba before he can get hit? (probably the 2nd)
+            b->oInteractionSubtype &= ~INT_SUBTYPE_DELAY_INVINCIBILITY_LUIGI;
         }
         return 1;
     }

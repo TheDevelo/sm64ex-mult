@@ -2805,7 +2805,7 @@ s32 obj_attack_collided_from_other_object(struct Object *obj) {
     if (numCollidedObjs != 0) {
         other = obj->collidedObjs[0];
 
-        if (other != gMarioObject) {
+        if (other != gMarioObject && other != gLuigiObject) {
             other->oInteractStatus |= ATTACK_PUNCH | INT_STATUS_WAS_ATTACKED | INT_STATUS_INTERACTED
                                       | INT_STATUS_TOUCHED_BOB_OMB;
             touchedOtherObject = TRUE;

@@ -917,10 +917,19 @@ void cur_obj_update(void) {
     f32 distanceFromMario;
     BhvCommandProc bhvCmdProc;
     s32 bhvProcResult;
+    int marioCloser = 1; // No bools... Maybe I should just add them
+
+    // TODO: Separate distance and angle for each player so that I don't have to go with the closest player
+    // For distance & angle use closest player as most care about whether a player is close.
 
     // Calculate the distance from the object to Mario.
     if (objFlags & OBJ_FLAG_COMPUTE_DIST_TO_MARIO) {
+        f32 luigiDistance = dist_between_objects(gCurrentObject, gLuigiObject);
         gCurrentObject->oDistanceToMario = dist_between_objects(gCurrentObject, gMarioObject);
+        if (luigiDistance < gCurrentObject->oDistanceToMario) {
+            gCurrentObject->oDistanceToMario = luigiDistance;
+            marioCloser = 0;
+        }
         distanceFromMario = gCurrentObject->oDistanceToMario;
     } else {
         distanceFromMario = 0.0f;
@@ -928,7 +937,12 @@ void cur_obj_update(void) {
 
     // Calculate the angle from the object to Mario.
     if (objFlags & OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO) {
-        gCurrentObject->oAngleToMario = obj_angle_to_object(gCurrentObject, gMarioObject);
+        if (marioCloser) {
+            gCurrentObject->oAngleToMario = obj_angle_to_object(gCurrentObject, gMarioObject);
+        }
+        else {
+            gCurrentObject->oAngleToMario = obj_angle_to_object(gCurrentObject, gLuigiObject);
+        }
     }
 
     // If the object's action has changed, reset the action timer.

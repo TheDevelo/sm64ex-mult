@@ -765,7 +765,11 @@ void load_object_collision_model(void) {
     // On an object's first frame, the distance is set to 19000.0f.
     // If the distance hasn't been updated, update it now.
     if (gCurrentObject->oDistanceToMario == 19000.0f) {
+        f32 luigiDist = dist_between_objects(gCurrentObject, gLuigiObject);
         marioDist = dist_between_objects(gCurrentObject, gMarioObject);
+        if (luigiDist < marioDist) {
+            marioDist = luigiDist;
+        }
     }
 
     // If the object collision is supposed to be loaded more than the
